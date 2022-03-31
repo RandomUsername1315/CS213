@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,12 +15,20 @@ public class GhostSheepBehavior : AgentBehaviour
     private GhostSheepState state;
     public void Start(){
         state = GhostSheepState.sheep;
+        Invoke("changeState", Random.Range(5, 20));
+    }
+
+    private void changeState() {
+        if (state == GhostSheepState.sheep){
+            state = GhostSheepState.ghost;
+            SetVisualEffect(0, 255, 0, 0, )
+        } else {
+            state = GhostSheepState.sheep;
+            Invoke("changeState", Random.Range(5, 30));
+        }
     }
     public override Steering GetSteering()
     {
-        float horizontal = 0;
-        float vertical = 0;
-
         Steering steering = new Steering();
         UnityEngine.Vector3 position = transform.position;
         float distance = Mathf.Infinity;
@@ -33,20 +40,27 @@ public class GhostSheepBehavior : AgentBehaviour
             if (cur_distance != 0 && cur_distance < distance) {
                 closest = dog.transform.position;
                 distance = cur_distance;
-                Debug.Log("New clossest");
+             //   Debug.Log("New clossest");
             }
         }  
+        float defX = position.x - closest.x;
+        float defZ = position.z - closest.z;
+        if (state == GhostSheepState.ghost){
+            defX = -defX;
+            defZ = -defZ;
+        }
 
-        
-        horizontal = 10 / (position.x - closest.x);
-        vertical = 10 / (position.z - closest.z); 
-
-        steering.linear = new Vector3(horizontal, 0, vertical) * agent.maxAccel;
-
+        steering.linear = new Vector3(clamp(defX), 0, clamp(defZ)) * agent.maxAccel;
+        print(steering.linear);
         steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
-        return steering;
+    return steering;
     }
 
-
+    private float clamp(float diff){
+        if (diff < 0.15 && diff > -0.15){return 0;}
+        if (diff < -1) {return -1;}
+        if (diff > 1) {return 1;}
+        return 0.2f / (diff); 
+    }
 
 }
