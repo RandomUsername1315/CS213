@@ -21,8 +21,9 @@ public class GhostSheepBehavior : AgentBehaviour
     private void changeState() {
         if (state == GhostSheepState.sheep){
             state = GhostSheepState.ghost;
-            SetVisualEffect(0, 255, 0, 0, )
-        } else {
+            //transform.SetVisualEffect(0, 255, 0, 0)
+            } 
+            else {
             state = GhostSheepState.sheep;
             Invoke("changeState", Random.Range(5, 30));
         }
@@ -37,14 +38,15 @@ public class GhostSheepBehavior : AgentBehaviour
 
         foreach (GameObject dog in dogs){
             float cur_distance = Vector3.Distance(position, dog.transform.position);
-            if (cur_distance != 0 && cur_distance < distance) {
-                closest = dog.transform.position;
-                distance = cur_distance;
+            
+                distance += cur_distance;
              //   Debug.Log("New clossest");
-            }
+            
         }  
-        float defX = position.x - closest.x;
-        float defZ = position.z - closest.z;
+
+        float defX = (position.x - closest.x )/2;
+        float defZ = (position.z - closest.z)/2;
+
         if (state == GhostSheepState.ghost){
             defX = -defX;
             defZ = -defZ;
