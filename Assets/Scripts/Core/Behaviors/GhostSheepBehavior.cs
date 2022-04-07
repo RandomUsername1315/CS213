@@ -33,15 +33,14 @@ public class GhostSheepBehavior : AgentBehaviour
             if (cur_distance != 0 && cur_distance < distance) {
                 closest = dog.transform.position;
                 distance = cur_distance;
-                Debug.Log("New clossest");
             }
         }  
 
         
-        horizontal = 10 / (position.x - closest.x);
-        vertical = 10 / (position.z - closest.z); 
+        // horizontal = -1 / (position.x - closest.x);
+        // vertical = -1 / (position.z - closest.z); 
 
-        steering.linear = new Vector3(horizontal, 0, vertical) * agent.maxAccel;
+        steering.linear = Vector3.MoveTowards(position, closest, Time.deltaTime * 2) * agent.maxAccel;
 
         steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
         return steering;
