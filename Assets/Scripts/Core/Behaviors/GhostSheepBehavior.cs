@@ -65,4 +65,11 @@ public class GhostSheepBehavior : AgentBehaviour
         return 0.2f / (diff); 
     }
 
+    void OnTriggerEnter(Collider other){
+        if(other.CompareTag("Dog") && this.state == 0){
+            other.incrementScore(-1.0);
+        }
+    }
+
+
 }
