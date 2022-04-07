@@ -7,10 +7,12 @@ using UnityEngine.UI;
 public class Timer : MonoBehaviour
 {
     private float initTimerValue;
-    private Text timerText;
+    public Text timerText;
     public Slider slider;
     public float maxMinutes = 5;
     public GameManager gameManager;
+
+    private float curr_time;
 
     public void Awake() {
         initTimerValue = Time.time; 
@@ -18,14 +20,18 @@ public class Timer : MonoBehaviour
 
     // Start is called before the first frame update
     public void Start() {
-        timerText = GetComponent<Text>();
+        this.Awake();
+        curr_time = maxMinutes * 60;
+        //timerText = GetComponent<Text>();
         timerText.text = string.Format("{0:00}:{1:00}", 0, 0);
     }
 
     // Update is called once per frame
     public void Update() {
 
-        //IMPLEEMT YOUR CODE HERE
-        
+        curr_time = curr_time - Time.deltaTime;
+        print(curr_time);
+        slider.value = curr_time/(maxMinutes * 60);
+        timerText.text = curr_time.ToString();
     }
 }
