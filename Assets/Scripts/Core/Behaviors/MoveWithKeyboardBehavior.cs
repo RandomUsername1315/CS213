@@ -4,13 +4,27 @@ using UnityEngine;
 
 //Input Keys
 public enum InputKeyboard{
-    arrows =0, 
+    arrows =0,
     wasd = 1
 }
 public class MoveWithKeyboardBehavior : AgentBehaviour
 {
     public InputKeyboard inputKeyboard; 
+    public int score = 0;
 
+    public int getScore(){
+        return score; 
+    }
+
+    public void resetScore(){
+        score = 0;
+    }
+
+    public void incrementScore(int val){
+        score += val;
+    }
+
+    
     public override Steering GetSteering()
     {
         Steering steering = new Steering();

@@ -3,73 +3,99 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-
-public class GhostSheepBehavior : AgentBehaviour
-{    
-    private enum GhostSheepState{
+public enum GhostSheepState{
     ghost = 0, 
     sheep = 1
     }   
 
+public class GhostSheepBehavior : AgentBehaviour
+{    
+    
+
     private GhostSheepState state;
     public void Start(){
         state = GhostSheepState.sheep;
-        Invoke("changeState", Random.Range(5, 20));
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+        Invoke("changeState", Random.Range(5, 10));
     }
 
     private void changeState() {
         if (state == GhostSheepState.sheep){
             state = GhostSheepState.ghost;
-            //transform.SetVisualEffect(0, 255, 0, 0)
-            } 
-            else {
+            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0);
+        } else {
             state = GhostSheepState.sheep;
-            Invoke("changeState", Random.Range(5, 30));
+            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+            Invoke("changeState", Random.Range(5, 15));
         }
+    }
+
+    public GhostSheepState getState(){
+        return state;
     }
     public override Steering GetSteering()
     {
         Steering steering = new Steering();
         UnityEngine.Vector3 position = transform.position;
-        float distance = Mathf.Infinity;
-        GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
-        UnityEngine.Vector3 closest = new UnityEngine.Vector3(0, 0, 0);
+        GameObject dog = closestDog();
 
-        foreach (GameObject dog in dogs){
-            float cur_distance = Vector3.Distance(position, dog.transform.position);
-            
-                distance += cur_distance;
-             //   Debug.Log("New clossest");
-            
-        }  
-
-        float defX = (position.x - closest.x )/2;
-        float defZ = (position.z - closest.z)/2;
-
+        Vector3 speed = new Vector3(0, 0, 0); 
         if (state == GhostSheepState.ghost){
-            defX = -defX;
-            defZ = -defZ;
+            speed.x = (-position.x + dog.transform.position.x);
+            speed.z = (-position.z + dog.transform.position.z);
         }
-
-        steering.linear = new Vector3(clamp(defX), 0, clamp(defZ)) * agent.maxAccel;
-        print(steering.linear);
-        steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
+        else{
+            speed = getAverage();
+        }
+        speed = Vector3.ClampMagnitude(speed, 1);
+        steering.linear = speed * agent.maxAccel;
     return steering;
     }
 
-    private float clamp(float diff){
-        if (diff < 0.15 && diff > -0.15){return 0;}
-        if (diff < -1) {return -1;}
-        if (diff > 1) {return 1;}
-        return 0.2f / (diff); 
+    public UnityEngine.Vector3 getAverage(){
+        GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
+        UnityEngine.Vector3 average = new UnityEngine.Vector3(0, 0, 0);
+
+        foreach (GameObject dog in dogs)
+        {
+            float cur_distance = Vector3.Distance(transform.position, dog.transform.position);
+            if(cur_distance < 7){
+                print(average);
+                average += transform.position-dog.transform.position;
+            }
+        }
+     
+        return average / dogs.Length;
     }
 
-    void OnTriggerEnter(Collider other){
-        if(other.CompareTag("Dog") && this.state == 0){
-            other.incrementScore(-1.0);
+    public GameObject closestDog(){
+        GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
+        UnityEngine.Vector3 position = transform.position;
+        float distance = Mathf.Infinity;
+
+        GameObject closest = dogs[0];
+
+        foreach (GameObject dog in dogs){
+            float cur_distance = Vector3.Distance(position, dog.transform.position);
+            if (cur_distance < distance) {
+                closest = dog;
+                distance = cur_distance;
+            }
+        }
+
+        return closest;
+    }
+    private float clamp(float val){
+        return (val > 3) ? 3f : ((val<-3) ? -3f : val);
+    }
+
+    void OnCollisionEnter(Collision other) {
+        if(other.gameObject.tag == "Dog" && this.state == 0){
+            other.gameObject.GetComponent<MoveWithKeyboardBehavior>().incrementScore(-1);
+            changeState();
         }
     }
-
 
 }

@@ -19,23 +19,11 @@ public class RingTrigger : MonoBehaviour
     {
         GameObject sheep = GameObject.FindGameObjectsWithTag("Sheep")[0];
 
-        if (other.CompareTag("Sheep") && sheep.getState == 1)
+        if (other.CompareTag("Sheep") && sheep.GetComponent<GhostSheepBehavior>().getState() == GhostSheepState.sheep)
         {
-            float distance = Mathf.Infinity;
-            GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
-            GameObject closest = dogs[0];
+            GameObject closest = sheep.GetComponent<GhostSheepBehavior>().closestDog();
 
-            foreach (GameObject dog in dogs)
-            {
-                float cur_distance = Vector3.Distance(sheep.transform.position, dog.transform.position);
-
-                if (cur_distance < distance)
-                {
-                    closest = dog;
-                }
-            }
-
-            closest.incrementScore(1.0);
+            closest.GetComponent<MoveWithKeyboardBehavior>().incrementScore(1);
 
         }
     }
