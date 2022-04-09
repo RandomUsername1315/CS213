@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 //Input Keys
 public enum InputKeyboard{
@@ -10,23 +11,35 @@ public enum InputKeyboard{
 public class MoveWithKeyboardBehavior : AgentBehaviour
 {
     public InputKeyboard inputKeyboard; 
-    public int score = 0;
-
+    //Physical reference of the score
+    public Text score;
+    public int points = 0;
+    public string name = "PlayerX";
     public int getScore(){
-        return score; 
+        return points; 
     }
 
     public void resetScore(){
-        score = 0;
+        points = 0;
     }
 
     public void incrementScore(int val){
-        score += val;
+        points += val;
+
     }
 
+    public void Start(){
+        points = 0;
+        score.text = string.Format("{0,3}", points);
+    }
+    public void Update() {
+        score.text = string.Format("{0,3}", points);
+    }
     
     public override Steering GetSteering()
     {
+        
+
         Steering steering = new Steering();
         float horizontal = 0;
         float vertical = 0;

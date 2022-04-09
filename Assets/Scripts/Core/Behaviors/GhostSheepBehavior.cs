@@ -12,23 +12,26 @@ public enum GhostSheepState{
 
 public class GhostSheepBehavior : AgentBehaviour
 {    
-    
 
     private GhostSheepState state;
+
     public void Start(){
         state = GhostSheepState.sheep;
         agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
-        Invoke("changeState", Random.Range(5, 10));
+        Invoke("changeState", Random.Range(10, 20));
     }
 
     private void changeState() {
+        // When sheep, just go to ghost
         if (state == GhostSheepState.sheep){
             state = GhostSheepState.ghost;
-            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0);
+            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0); 
+            Invoke("changeState", Random.Range(10, 20));
         } else {
+        // When ghost, just go to sheep
             state = GhostSheepState.sheep;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
-            Invoke("changeState", Random.Range(5, 15));
+            Invoke("changeState", Random.Range(10, 20));
         }
     }
 
@@ -62,7 +65,7 @@ public class GhostSheepBehavior : AgentBehaviour
         {
             float cur_distance = Vector3.Distance(transform.position, dog.transform.position);
             if(cur_distance < 7){
-                print(average);
+              //  print(average);
                 average += transform.position-dog.transform.position;
             }
         }
@@ -92,8 +95,10 @@ public class GhostSheepBehavior : AgentBehaviour
     }
 
     void OnCollisionEnter(Collision other) {
-        if(other.gameObject.tag == "Dog" && this.state == 0){
+        if(other.gameObject.tag == "Dog" && this.state == GhostSheepState.ghost){
             other.gameObject.GetComponent<MoveWithKeyboardBehavior>().incrementScore(-1);
+            // Avoids having an invoke poping at bad moment
+            CancelInvoke("changeState");
             changeState();
         }
     }

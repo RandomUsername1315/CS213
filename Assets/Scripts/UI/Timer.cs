@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +23,6 @@ public class Timer : MonoBehaviour
     public void Start() {
         this.Awake();
         curr_time = maxMinutes * 60;
-        //timerText = GetComponent<Text>();
         timerText.text = string.Format("{0:00}:{1:00}", 0, 0);
     }
 
@@ -30,8 +30,11 @@ public class Timer : MonoBehaviour
     public void Update() {
 
         curr_time = curr_time - Time.deltaTime;
-        print(curr_time);
-        slider.value = curr_time/(maxMinutes * 60);
-        timerText.text = curr_time.ToString();
+        slider.value = 1 - curr_time/(maxMinutes * 60);
+        timerText.text = string.Format("Remaining time: {0:00}:{1:00}", Math.Floor(curr_time / 60f), curr_time % 60);
+
+        if(curr_time <= 0){
+            gameManager.gameOverMode();
+        }
     }
 }
