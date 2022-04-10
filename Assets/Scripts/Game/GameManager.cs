@@ -12,9 +12,17 @@ public class GameManager : MonoBehaviour
     public GameObject canvas;
     public GameObject winnerCanvas;
     public Text text;
+    public AudioSource audioSource;
     // Start is called before the first frame update
     public void Start()
     {
+        if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
+            audioSource.enabled = true;
+            audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
+        } else {
+            audioSource.enabled = false;
+        }
+        
         winnerCanvas.SetActive(false);
         canvas.SetActive(true);
     }
@@ -38,6 +46,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void loadMenu(){
-        SceneManager.LoadScene("MenuScene", LoadSceneMode.Single);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 }

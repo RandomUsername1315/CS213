@@ -19,12 +19,12 @@ public class RingTrigger : MonoBehaviour
     {
         
         GameObject sheep = GameObject.FindGameObjectsWithTag("Sheep")[0];
-        print("Green circle Triggered : " + other.attachedRigidbody.name);
+        // print("Green circle Triggered : " + other.attachedRigidbody.name);
 
         if (other.attachedRigidbody.tag =="Sheep" && sheep.GetComponent<GhostSheepBehavior>().getState() == GhostSheepState.sheep)
         {
             GameObject closest = sheep.GetComponent<GhostSheepBehavior>().closestDog();
-            print("Closest is " + closest.ToString() );
+           // print("Closest is " + closest.ToString() );
             closest.GetComponent<MoveWithKeyboardBehavior>().incrementScore(1);
 
         }
