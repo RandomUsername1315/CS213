@@ -5,7 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-
+using System.Globalization;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,9 +18,16 @@ public class GameManager : MonoBehaviour
     public GameObject winnerCanvas;
     public Text text;
     public AudioSource audioSource;
+
+    private bool hasStarted;
+    private bool gameOver;
     // Start is called before the first frame update
     public void Start()
     {
+        Time.timeScale = 0;
+
+        hasStarted = false;
+        gameOver = false;
         if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
             audioSource.enabled = true;
             audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
@@ -27,8 +39,16 @@ public class GameManager : MonoBehaviour
         canvas.SetActive(true);
     }
 
+    public void startGame(){
+        if(!hasStarted){
+            hasStarted = true;
+            Time.timeScale = 1;
+
+        }
+    }
 
     public void gameOverMode(){
+        gameOver = true;
         Time.timeScale = 0;
         canvas.SetActive(false);
 

@@ -19,7 +19,7 @@ public class SteeringAgent : MonoBehaviour
     protected Steering steering;
     private AgentBehaviour[] behaviours; 
 
-    void Start()
+    protected virtual void Start()
     {
         velocity = Vector3.zero;
         steering = new Steering();
@@ -59,8 +59,7 @@ public class SteeringAgent : MonoBehaviour
     {
         this.steering.linear += (weight * steering.linear);
         this.steering.angular += (weight * steering.angular);
-    }
-   
+    }   
 }
 
 //!< Steering serves as a custom data type for storing the movement and rotation of the agent:

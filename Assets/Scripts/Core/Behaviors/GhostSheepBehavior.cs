@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Runtime.CompilerServices;
 
 public enum GhostSheepState{
     ghost = 0, 
@@ -26,12 +27,40 @@ public class GhostSheepBehavior : AgentBehaviour
         if (state == GhostSheepState.sheep){
             state = GhostSheepState.ghost;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0); 
+          //  agent._celluloRobot.SetVisualEffect(1, 255, 0, 0, 0); 
+            hardMode();
             Invoke("changeState", Random.Range(10, 20));
         } else {
         // When ghost, just go to sheep
             state = GhostSheepState.sheep;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+            easyMode();
             Invoke("changeState", Random.Range(10, 20));
+        }
+    }
+
+    private void hardMode(){
+       // GameObject cells = GameObject.FindGameObjectsWithTag("Cellulos");
+        Object[] cells = GameObject.FindObjectsOfType(typeof(CelluloAgent));
+
+        foreach(GameObject cell in cells){
+            if (cell.tag == "Dog"){
+                cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(false);
+                cell.GetComponent<CelluloAgent>().MoveOnStone();
+            }
+        }
+    }
+
+    private void easyMode(){
+       // GameObject cells = GameObject.FindGameObjectsWithTag("Cellulos");
+        Object[] cells = GameObject.FindObjectsOfType(typeof(CelluloAgent));
+
+        foreach(GameObject cell in cells){
+            if (cell.tag == "Dog"){
+                cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(true);
+                cell.GetComponent<CelluloAgent>().MoveOnSandpaper();
+
+            }
         }
     }
 

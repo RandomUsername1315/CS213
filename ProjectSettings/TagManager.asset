@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Dog
   - Sheep
+  - Border
   layers:
   - Default
   - TransparentFX

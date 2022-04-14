@@ -35,6 +35,20 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
     public void Update() {
         score.text = string.Format("{0,3}", points);
     }
+
+   /* private void OnCollisionEnter(Collision other) {
+        if (other.gameObject.tag == "Border"){
+            if (other.gameObject.name == "Top") {
+                GetComponentInParent<CelluloAgent>.
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision other) {
+        if (other.gameObject.tag == "Border"){
+
+        }
+    } */
     
     public override Steering GetSteering()
     {
