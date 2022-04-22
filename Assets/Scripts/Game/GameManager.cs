@@ -16,17 +16,18 @@ public class GameManager : MonoBehaviour
 {
     public GameObject canvas;
     public GameObject winnerCanvas;
+    
+    public GameObject startCanvas;
+
     public Text text;
     public AudioSource audioSource;
 
-    private bool hasStarted;
+    private bool isRunning;
     private bool gameOver;
     // Start is called before the first frame update
     public void Start()
     {
-        Time.timeScale = 0;
-
-        hasStarted = false;
+        isRunning = false;
         gameOver = false;
         if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
             audioSource.enabled = true;
@@ -37,19 +38,22 @@ public class GameManager : MonoBehaviour
         
         winnerCanvas.SetActive(false);
         canvas.SetActive(true);
+        startCanvas.SetActive(true);
     }
 
     public void startGame(){
-        if(!hasStarted){
-            hasStarted = true;
-            Time.timeScale = 1;
-
+        if(!isRunning){
+            isRunning = true;
+            startCanvas.SetActive(false);
         }
     }
 
+    public bool isGameRunning(){
+        return isRunning;
+    }
     public void gameOverMode(){
         gameOver = true;
-        Time.timeScale = 0;
+        isRunning = false;
         canvas.SetActive(false);
 
         GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
@@ -66,7 +70,6 @@ public class GameManager : MonoBehaviour
     }
 
     public void loadMenu(){
-        Time.timeScale = 1;
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 }
