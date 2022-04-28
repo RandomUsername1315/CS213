@@ -29,21 +29,20 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
     }
 
     public void incrementScore(int val){
-        if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
-            this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
-            if (val < 0){
-               this.GetComponentInParent<AudioSource>().clip = loseSound;
-            } else
-            {
-               this.GetComponentInParent<AudioSource>().clip = winSound;
-            }
-            this.GetComponentInParent<AudioSource>().Play(0);
-                }
+        if (val < 0){
+            this.GetComponentInParent<AudioSource>().clip = loseSound;
+        } else
+        {
+            this.GetComponentInParent<AudioSource>().clip = winSound;
+        }
+        this.GetComponentInParent<AudioSource>().Play(0);
         points += val;
 
     }
 
     public void Start(){
+        this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.yellow, 0);
         points = 0;
         score.text = string.Format("{0,3}", points);
     }
@@ -55,12 +54,23 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
         if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning() &&
             other.gameObject.tag == "Dog" && gemBonus){
             other.gameObject.GetComponent<MoveWithKeyboardBehavior>().incrementScore(-2);
-            points += 2;
+            incrementScore(2);
             gemBonus = false;
         }
         
     }
-
+    
+    public override void OnCelluloLongTouch(int key){
+        GameManager manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        if (manager.GetReadyToStart() == null){
+            manager.SetReadyToStart(this);
+        } else {
+            if (manager.GetReadyToStart() != this){
+                manager.SetReadyToStart(null);
+                manager.startGame();
+            }
+        }
+    }
    /* private void OnCollisionEnter(Collision other) {
         if (other.gameObject.tag == "Border"){
             if (other.gameObject.name == "Top") {
@@ -77,8 +87,6 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
     
     public override Steering GetSteering()
     {
-        
-
         Steering steering = new Steering();
         float horizontal = 0;
         float vertical = 0;
@@ -97,9 +105,4 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
         steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
         return steering;
     }
-
-    public void StartGame(){
-
-    }
-
 }

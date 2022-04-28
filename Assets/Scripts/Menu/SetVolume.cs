@@ -11,12 +11,7 @@ public class SetVolume : MonoBehaviour
     }
 
     public void EnableVolumeControl(bool enableVolume){
-        if (enableVolume){ 
-            PlayerPrefs.SetInt("VolumeEnable", 1);
-            print(1);
-        } else
-        {
-            PlayerPrefs.SetInt("VolumeEnable", 0);
-        }
+        PlayerPrefs.SetInt("MusicEnable", (enableVolume) ? 1 : 0);
+        
     }
 }

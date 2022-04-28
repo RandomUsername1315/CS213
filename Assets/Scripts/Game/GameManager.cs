@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public Text text;
     public AudioSource audioSource;
 
+    private MoveWithKeyboardBehavior readyToStart=null;
     private bool isRunning;
     private bool gameOver;
     // Start is called before the first frame update
@@ -31,7 +32,7 @@ public class GameManager : MonoBehaviour
         audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;
         gameOver = false;
-        if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
+        if (PlayerPrefs.GetInt("MusicEnable", 1) == 1){
             audioSource.enabled = true;
             audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
         } else {
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
             isRunning = true;
             startCanvas.SetActive(false);
         }
+        GameObject.FindGameObjectWithTag("Sheep").GetComponent<GhostSheepBehavior>().changeState();
     }
 
     public bool isGameRunning(){
@@ -77,5 +79,12 @@ public class GameManager : MonoBehaviour
 
     public void loadMenu(){
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+    }
+
+    public MoveWithKeyboardBehavior GetReadyToStart(){
+        return readyToStart;
+    }
+    public void SetReadyToStart(MoveWithKeyboardBehavior val){
+        readyToStart = val;
     }
 }

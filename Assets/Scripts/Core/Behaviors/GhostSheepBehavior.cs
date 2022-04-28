@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 public enum GhostSheepState{
     ghost = 0,
@@ -16,53 +17,57 @@ public class GhostSheepBehavior : AgentBehaviour
 {    
 
     private GhostSheepState state;
+    public AudioClip ghostSound;
+    public AudioClip sheepSound;
+
 
     public void Start(){
-        state = GhostSheepState.sheep;
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
-        Invoke("changeState", Random.Range(10, 20));
-    
+        this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
+        state = GhostSheepState.paused;
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.black, 0);
     }
 
-    private void changeState() {
+    public void changeState() {
         // When sheep, just go to ghost
-        if (state == GhostSheepState.sheep){
-            state = GhostSheepState.ghost;
-            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0); 
-          //  agent._celluloRobot.SetVisualEffect(1, 255, 0, 0, 0); 
-            hardMode();
-            Invoke("changeState", Random.Range(10, 20));
-        } else {
-        // When ghost, just go to sheep
-            state = GhostSheepState.sheep;
-            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
-            easyMode();
-            Invoke("changeState", Random.Range(10, 20));
+        print("state Changed");
+        switch(state)
+        {
+            case GhostSheepState.sheep:
+                state = GhostSheepState.ghost;
+                this.GetComponentInParent<AudioSource>().clip = ghostSound;
+                this.GetComponentInParent<AudioSource>().Play(0);
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0); 
+                hardMode();
+                Invoke("changeState", Random.Range(7, 14));
+                break;
+            case GhostSheepState.ghost:
+            case GhostSheepState.paused:
+                state = GhostSheepState.sheep;
+                this.GetComponentInParent<AudioSource>().clip = sheepSound;
+                this.GetComponentInParent<AudioSource>().Play(0);
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+                easyMode();
+                Invoke("changeState", Random.Range(15, 30));
+                break;
+
         }
     }
 
     private void hardMode(){
-       // GameObject cells = GameObject.FindGameObjectsWithTag("Cellulos");
-        Object[] cells = GameObject.FindObjectsOfType(typeof(CelluloAgent));
-
+        GameObject[] cells = GameObject.FindGameObjectsWithTag("Dog");
+        
         foreach(GameObject cell in cells){
-            if (cell.tag == "Dog"){
-                cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(false);
-                cell.GetComponent<CelluloAgent>().MoveOnStone();
-            }
+            cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(false);
+            cell.GetComponent<CelluloAgent>().MoveOnStone();
         }
     }
 
     private void easyMode(){
-       // GameObject cells = GameObject.FindGameObjectsWithTag("Cellulos");
-        Object[] cells = GameObject.FindObjectsOfType(typeof(CelluloAgent));
+        GameObject[] cells = GameObject.FindGameObjectsWithTag("Dog");
 
         foreach(GameObject cell in cells){
-            if (cell.tag == "Dog"){
-                cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(true);
-                cell.GetComponent<CelluloAgent>().MoveOnSandpaper();
-
-            }
+            cell.GetComponent<CelluloAgent>().SetCasualBackdriveAssistEnabled(true);
+            cell.GetComponent<CelluloAgent>().MoveOnSandpaper();
         }
     }
 
@@ -72,8 +77,7 @@ public class GhostSheepBehavior : AgentBehaviour
     public override Steering GetSteering()
     {
         Steering steering = new Steering();
-        if (!GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning()){
-            CancelInvoke();
+        if (state == GhostSheepState.paused){
             steering.linear = Vector3.zero;
             steering.angular = 0f;
             return steering;
@@ -133,16 +137,12 @@ public class GhostSheepBehavior : AgentBehaviour
 
     void OnCollisionEnter(Collision other) {
         if(GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning() 
-           && other.gameObject.tag == "Dog" && this.state == GhostSheepState.ghost){
+           && other.gameObject.tag == "Dog" && state == GhostSheepState.ghost){
             other.gameObject.GetComponent<MoveWithKeyboardBehavior>().incrementScore(-1);
             // Avoids having an invoke poping at bad moment
             CancelInvoke("changeState");
             changeState();
         }
-    }
-
-    void StartGame(){
-        
     }
 
 }
