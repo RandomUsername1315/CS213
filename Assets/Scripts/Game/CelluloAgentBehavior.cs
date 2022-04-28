@@ -13,7 +13,11 @@ public class CelluloAgentBehavior : AgentBehaviour
         }
         if (ready != this){
             ready = null;
-            this.GetComponent<GameManager>().startGame();
+            if (!GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning() 
+             && !GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().gameIsOver() ){
+                this.GetComponent<GameManager>().startGame();
+            }
+            
         }
     }
 }

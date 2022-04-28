@@ -7,8 +7,9 @@ using UnityEngine.UIElements;
 using System.Runtime.CompilerServices;
 
 public enum GhostSheepState{
-    ghost = 0, 
-    sheep = 1
+    ghost = 0,
+    sheep = 1,
+    paused = 2
     }   
 
 public class GhostSheepBehavior : AgentBehaviour
@@ -20,6 +21,7 @@ public class GhostSheepBehavior : AgentBehaviour
         state = GhostSheepState.sheep;
         agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
         Invoke("changeState", Random.Range(10, 20));
+    
     }
 
     private void changeState() {
@@ -70,6 +72,12 @@ public class GhostSheepBehavior : AgentBehaviour
     public override Steering GetSteering()
     {
         Steering steering = new Steering();
+        if (!GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning()){
+            CancelInvoke();
+            steering.linear = Vector3.zero;
+            steering.angular = 0f;
+            return steering;
+        }
         UnityEngine.Vector3 position = transform.position;
         GameObject dog = closestDog();
 
@@ -124,12 +132,17 @@ public class GhostSheepBehavior : AgentBehaviour
     }
 
     void OnCollisionEnter(Collision other) {
-        if(other.gameObject.tag == "Dog" && this.state == GhostSheepState.ghost){
+        if(GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().isGameRunning() 
+           && other.gameObject.tag == "Dog" && this.state == GhostSheepState.ghost){
             other.gameObject.GetComponent<MoveWithKeyboardBehavior>().incrementScore(-1);
             // Avoids having an invoke poping at bad moment
             CancelInvoke("changeState");
             changeState();
         }
+    }
+
+    void StartGame(){
+        
     }
 
 }

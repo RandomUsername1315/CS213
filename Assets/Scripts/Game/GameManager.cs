@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEditor.Animations;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     public void Start()
     {
+        audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;
         gameOver = false;
         if (PlayerPrefs.GetInt("VolumeEnable", 1) == 1){
@@ -50,6 +52,10 @@ public class GameManager : MonoBehaviour
 
     public bool isGameRunning(){
         return isRunning;
+    }
+
+    public bool gameIsOver(){
+        return gameOver;
     }
     public void gameOverMode(){
         gameOver = true;

@@ -17,7 +17,7 @@ public class RingTrigger : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        
+           
         GameObject sheep = GameObject.FindGameObjectsWithTag("Sheep")[0];
         // print("Green circle Triggered : " + other.attachedRigidbody.name);
 
