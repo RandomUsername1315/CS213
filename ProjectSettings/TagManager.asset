@@ -8,6 +8,7 @@ TagManager:
   - Sheep
   - Border
   - Gem
+  - dropdown1
   layers:
   - Default
   - TransparentFX
