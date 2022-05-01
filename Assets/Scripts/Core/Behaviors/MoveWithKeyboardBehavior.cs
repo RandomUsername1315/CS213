@@ -51,7 +51,7 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
             color = PlayerPrefs.GetInt("color1", 0);            
         }
         else{
-            inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("player2Mv", 0);
+            inputKeyboard = (InputKeyboard)(PlayerPrefs.GetInt("displacement1", 0) == 0 ? 1 :0);
             color = PlayerPrefs.GetInt("player2Color", 0);
         }
 
