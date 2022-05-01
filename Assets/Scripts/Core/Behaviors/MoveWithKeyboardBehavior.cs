@@ -41,8 +41,29 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
     }
 
     public void Start(){
+        Color playerColor;
+        int color = 0;
+        //Player 1
+        if(this.gameObject.tag == "Dog1"){
+            inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("displacement1", 0);
+            color = PlayerPrefs.GetInt("color1", 0);
+            
+        }
+        else{
+            inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("player2Mv", 0);
+            color = PlayerPrefs.GetInt("player2Color", 0);
+        }
+        if(color == 0){
+            playerColor = Color.red;
+            }
+        else if(color == 1){
+            playerColor = Color.green;
+        }
+        else{
+            playerColor = Color.blue;
+        }
         this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.yellow, 0);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, playerColor, 0);
         points = 0;
         score.text = string.Format("{0,3}", points);
     }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10232652, g: 0.08247808, b: 0.107132934, a: 1}
+  m_IndirectSpecularColor: {r: 0.10230189, g: 0.08245758, b: 0.107066445, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3949,10 +3949,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 911377106}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ba2feba5af8bfe4f8aae26d92c43348, type: 3}
+  m_Script: {fileID: 11500000, guid: 9d28e961545c85f46985d94798e4ca2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplacementDD: {fileID: 911377108}
+  TimeSlider: {fileID: 911377108}
 --- !u!1 &912687337
 GameObject:
   m_ObjectHideFlags: 0
@@ -6432,10 +6432,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1243301509}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7fdbd71d20161b4491bc1cdccf8ece9, type: 3}
+  m_Script: {fileID: 11500000, guid: 1fd5308cae79a634fb0576093d925ab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplacementDD: {fileID: 1243301513}
+  ColorSlider: {fileID: 1243301513}
 --- !u!114 &1243301513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9252,6 +9252,7 @@ GameObject:
   - component: {fileID: 1655023568}
   - component: {fileID: 1655023567}
   - component: {fileID: 1655023566}
+  - component: {fileID: 1655023571}
   m_Layer: 5
   m_Name: DisplacementD2
   m_TagString: Untagged
@@ -9401,6 +9402,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1655023564}
   m_CullTransparentMesh: 1
+--- !u!114 &1655023571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655023564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d7650ad791795140ade11e2fee03bce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MvSlider: {fileID: 1655023568}
 --- !u!1 &1676371182
 GameObject:
   m_ObjectHideFlags: 0

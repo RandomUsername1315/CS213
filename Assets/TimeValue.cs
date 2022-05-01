@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Time : MonoBehaviour
+public class TimeValue : MonoBehaviour
 {
     // Start is called before the first frame update
     public TMPro.TMP_Dropdown TimeSlider;
