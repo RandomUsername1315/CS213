@@ -10,7 +10,7 @@ public class Timer : MonoBehaviour
     private float initTimerValue;
     public Text timerText;
     public Slider slider;
-    public float maxMinutes = 5;
+    public int maxMinutes = 5;
     public GameManager gameManager;
 
     private float curr_time;
@@ -18,6 +18,7 @@ public class Timer : MonoBehaviour
 
     // Start is called before the first frame update
     public void Start() {
+        maxMinutes= PlayerPrefs.GetInt("time", maxMinutes);
         curr_time = maxMinutes * 60;
         timerText.text = string.Format("{0:00}:{1:00}", 0, 0);
     }
