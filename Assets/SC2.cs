@@ -8,12 +8,12 @@ public class SC2 : MonoBehaviour
 
     void Start()
     {
-        int color = PlayerPrefs.GetInt("_qualityIndex", 0);
+        int color = PlayerPrefs.GetInt("color1", 0);
         DisplacementDD.value = color;
     }
 
-    public void SetColor(int colorIndex)
-    {
-        PlayerPrefs.SetInt("_qualityIndex", colorIndex);
+    void Update(){
+        PlayerPrefs.SetInt("color1", DisplacementDD.value);
     }
+        
 }

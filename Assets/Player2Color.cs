@@ -14,8 +14,7 @@ public class Player2Color : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void SetColor(int colorIndex)
-    {
-        PlayerPrefs.SetInt("player2Color", colorIndex);
+    void Update(){
+        PlayerPrefs.SetInt("player2Color", ColorSlider.value);
     }
 }

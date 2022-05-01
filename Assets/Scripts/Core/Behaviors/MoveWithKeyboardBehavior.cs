@@ -8,11 +8,13 @@ public enum InputKeyboard{
     arrows =0,
     wasd = 1
 }
+
 public class MoveWithKeyboardBehavior : AgentBehaviour
 {
     public InputKeyboard inputKeyboard; 
     //Physical reference of the score
     public Text score;
+
     public int points = 0;
     public string name = "PlayerX";
 
@@ -44,15 +46,15 @@ public class MoveWithKeyboardBehavior : AgentBehaviour
         Color playerColor;
         int color = 0;
         //Player 1
-        if(this.gameObject.tag == "Dog1"){
+        if(this.gameObject.name == "CelluloAgent_1"){
             inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("displacement1", 0);
-            color = PlayerPrefs.GetInt("color1", 0);
-            
+            color = PlayerPrefs.GetInt("color1", 0);            
         }
         else{
             inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("player2Mv", 0);
             color = PlayerPrefs.GetInt("player2Color", 0);
         }
+
         if(color == 0){
             playerColor = Color.red;
             }

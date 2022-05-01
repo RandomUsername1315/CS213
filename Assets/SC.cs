@@ -8,12 +8,12 @@ public class SC : MonoBehaviour
 
     void Start()
     {
-        int Displacement = PlayerPrefs.GetInt("_qualityIndex", 0);
+        int Displacement = PlayerPrefs.GetInt("displacement1", 0);
         DisplacementDD.value = Displacement;
     }
 
     public void SetDisplacement(int displacementIndex)
     {
-        PlayerPrefs.SetInt("_qualityIndex", displacementIndex);
+        PlayerPrefs.SetInt("displacement1", displacementIndex);
     }
 }
