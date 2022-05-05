@@ -7,6 +7,14 @@ public class ChangeSceneWithButton : MonoBehaviour
 {
     public void LoadScene(string scenename)
     {
-        SceneManager.LoadScene(scenename);
+        if(scenename != "SpaceGhostSheepGame"){
+            PlayerPrefs.SetString("Level", "level1");}
+        else{
+            PlayerPrefs.SetString("Level", scenename);
+            }
+        
+        SceneManager.LoadScene("ArrowGame");
+
+
     }
 }

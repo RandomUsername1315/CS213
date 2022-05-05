@@ -29,7 +29,7 @@ public class GhostSheepBehavior : AgentBehaviour
 
     public void changeState() {
         // When sheep, just go to ghost
-        print("state Changed");
+      //  print("state Changed");
         switch(state)
         {
             case GhostSheepState.sheep:
@@ -93,9 +93,12 @@ public class GhostSheepBehavior : AgentBehaviour
         else{
             speed = getAverage();
         }
-        speed = Vector3.ClampMagnitude(speed, 1);
+        speed = Vector3.ClampMagnitude(speed, 0.1f);
         steering.linear = speed * agent.maxAccel;
-    return steering;
+        //agent.SetSteering(steering);
+
+        print(steering.linear.ToString());
+        return steering;
     }
 
     public UnityEngine.Vector3 getAverage(){
