@@ -1,17 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.SceneManagement;
-using System.Globalization;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEditor.Animations;
 
 public class GameManagerArrows : MonoBehaviour
 {
@@ -47,7 +37,7 @@ public class GameManagerArrows : MonoBehaviour
             isRunning = true;
             startCanvas.SetActive(false);
         }
-        GameObject.FindGameObjectWithTag("Sheep").GetComponent<GhostSheepBehavior>().changeState();
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().startGame();
     }
 
     public bool isGameRunning(){
@@ -83,10 +73,4 @@ public class GameManagerArrows : MonoBehaviour
        PlayerPrefs.SetString("Level", level);
     }
 
-    public MoveWithKeyboardBehavior GetReadyToStart(){
-        return readyToStart;
-    }
-    public void SetReadyToStart(PlayerControl val){
-        readyToStart = val;
-    }
 }
