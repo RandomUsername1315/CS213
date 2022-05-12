@@ -23,12 +23,16 @@ public class PlayerControl : AgentBehaviour
     private PlayerState  currState = PlayerState.waiting;
 
     private static float maxDeltaDistance = 0.1f;
-    private static float xStart = 2.827304f;
-    private static float zStart = -5.000934f;
+    private static Vector3 startPoint = new Vector3(2.827304f, 0, -5.000934f);
 
-    private float time;
-    private float initZPos;
-    private float initXSpos;
+    private int lives = 3;
+
+    private int score = 0;
+
+    private float time = float.NaN;
+    
+    private Vector3 force = Vector3.zero;
+
     public PlayerState getState(){
         return currState;
     }
@@ -52,15 +56,48 @@ public class PlayerControl : AgentBehaviour
    //     this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
         agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, playerColor, 0);
         agent.isMoved = false;
+
     }
     public void update() {
+        getComponent<GameMaanagerArrows>().level();
     }
 
+    private void incrementScore(){
+        score +=1;
+    }
+    private void decreaseScore(){
+        score -=1;
+    }
+
+    public int livesLeft(){
+        return lives;
+    }
 
     void OnCollisionEnter(Collision other) {
         if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerArrows>().isGameRunning()){
             return;
-        }  
+        } 
+        // and the blocker must be in an active state
+        else if(other.gameObject.tag == "blocker"){
+            currState = PlayerState.starting;
+            //if(attackemodeOrSomethng){decreseScore()};
+            //and remove a life.
+            //--lives;
+            if(lives < 0){
+                //Ends the game if the player have not lives left
+                getComponent<GameMaanagerArrows>().gameOverMode();
+            }
+        }
+        else if(other.gameObject.tag == "target"){
+            incrementScore();            
+            currState = PlayerState.starting;
+
+        }
+        else if(other.gameObject.tag == "wall"){
+            //Reset
+            currState = PlayerState.starting;
+        }
+
     }
     
     public override void OnCelluloLongTouch(int val){
@@ -80,14 +117,18 @@ public class PlayerControl : AgentBehaviour
             
             currState = PlayerState.flying;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.white, 0);
-            time = Time.fixedTime;
             agent.isMoved = false;
+
+            Vector3 baseForce = new Vector3( startPoint.x - position.x, 0, startPoint.z - position.z);
+            print(baseForce + " with magnitude " + baseForce.magnitude);
+            force.x = baseForce.x * baseForce.magnitude / startPoint.magnitude * agent.maxAccel * this.GetComponent<Rigidbody>().mass; 
+            force.z = baseForce.z * baseForce.magnitude / startPoint.magnitude * agent.maxAccel *this.GetComponent<Rigidbody>().mass;
         }
     }
 
     public void startGame(){
         currState = PlayerState.starting;
-        print("Start game");
+        time = float.NaN;
     }
 
 
@@ -117,6 +158,7 @@ public class PlayerControl : AgentBehaviour
         //the whole movement (and state control)is going to be controlled by this function 
         Steering steering = new Steering();
         UnityEngine.Vector3 position = transform.localPosition;
+
         switch (currState){
             case PlayerState.waiting:
                 //print("Position" + transform.localPosition);
@@ -125,18 +167,22 @@ public class PlayerControl : AgentBehaviour
                 break;
 
             case PlayerState.flying:
-                if (position.x < xStart){
-                    Vector3 speed = Vector3.zero;
-                        speed.x = (xStart - )
-                    speed;
-                }
+                if (position.x < startPoint.x){
+                    steering.linear = force;
+                } else {
+                    if (float.IsNaN(time)){
+                        time = Time.time;
+                    }
+                    steering.linear = trajectory();
+                    print("Temps: " + time + ", force: "+ steering.linear.ToString());
+               }
+                
                 break;
             case PlayerState.starting:
                 Vector3 speed = new Vector3(0, 0, 0); 
-                speed.x = (-position.x + xStart) / 20;
-                speed.z = (-position.z + zStart) / 20;
-                print (speed.ToString());
-                steering.linear = maxedVect(speed) * agent.maxAccel;
+                speed.x = (-position.x + startPoint.x) / 20;
+                speed.z = (-position.z + startPoint.z) / 20;
+                steering.linear = maxedVect(speed) * agent.maxAccel * this.GetComponent<Rigidbody>().mass;
                 if (rightStartPos()){
                     currState = PlayerState.loading;
                     steering.linear = Vector3.zero;
@@ -151,17 +197,33 @@ public class PlayerControl : AgentBehaviour
                 break;
 
             case PlayerState.loading:
-                steering.linear = Vector3.zero;
-                steering.angular = 0;
-                print("loading");
+                float horizontal = Input.GetAxis("Horizontal_SecondDog");
+                float vertical = Input.GetAxis("Vertical_SecondDog");
+                steering.linear = new Vector3(horizontal, 0, vertical)* agent.maxAccel * this.GetComponent<Rigidbody>().mass;
+                steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
+                if (Input.GetKeyDown(KeyCode.Return)){
+                    OnCelluloTouchReleased(0);
+                }
                 break;
         }
         return steering;
     }
 
+
+    //time is when the player is first launched
+    private Vector3 trajectory(){
+        float timeDiff = Time.time - time;
+        Vector3 nextPos = new Vector3(0,0,0);
+
+        nextPos.x = (float) (force.x);
+        nextPos.z = (float) (force.z + Physics.gravity.z * timeDiff * this.GetComponent<Rigidbody>().mass); 
+
+        return nextPos;
+    }
+
     private bool rightStartPos(){
         UnityEngine.Vector3 pos = transform.localPosition;
-        double distance = Math.Sqrt((pos.x - xStart) * (pos.x - xStart) + (pos.z - zStart) * (pos.z - zStart));
+        double distance = Math.Sqrt((pos.x - startPoint.x) * (pos.x - startPoint.x) + (pos.z - startPoint.z) * (pos.z - startPoint.z));
         return distance < maxDeltaDistance;
     }
 
@@ -175,4 +237,6 @@ public class PlayerControl : AgentBehaviour
         vect.z = vect.z / mag;
         return vect;
     }
+
+
 }

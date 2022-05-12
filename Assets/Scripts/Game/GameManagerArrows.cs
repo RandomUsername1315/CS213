@@ -11,6 +11,8 @@ public class GameManagerArrows : MonoBehaviour
     public GameObject startCanvas;
 
     public Text text;
+
+    private int currLevel;
     public AudioSource audioSource;
     private bool isRunning;
     private bool gameOver;
@@ -20,6 +22,7 @@ public class GameManagerArrows : MonoBehaviour
         audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;
         gameOver = false;
+        currLevel = 1;
         if (PlayerPrefs.GetInt("MusicEnable", 1) == 1){
             audioSource.enabled = true;
             audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
@@ -42,6 +45,14 @@ public class GameManagerArrows : MonoBehaviour
 
     public bool isGameRunning(){
         return isRunning;
+    }
+
+    public void nextLevel(){
+        currLevel +=1;
+        setLevels(currLevel);
+    }
+    public int getLevel(){
+        return currLevel;
     }
 
     public bool gameIsOver(){
@@ -69,8 +80,8 @@ public class GameManagerArrows : MonoBehaviour
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
-    public void setLevels(String level){
-       PlayerPrefs.SetString("Level", level);
+    private void setLevels(int levelNumber){
+       PlayerPrefs.SetString("Level1", "level"+levelNumber);
     }
 
 }
