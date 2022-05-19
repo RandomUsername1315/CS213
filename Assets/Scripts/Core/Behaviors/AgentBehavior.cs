@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections;
 public class AgentBehaviour : MonoBehaviour
 {
+
     public float weight = 1.0f;
     protected CelluloAgent agent;
-
     public virtual void Awake()
     {
         agent = gameObject.GetComponent<CelluloAgent>();
@@ -48,5 +48,4 @@ public class AgentBehaviour : MonoBehaviour
     /// Event signaled when robot is kidnapped
     /// </summary>
     public virtual void OnCelluloKidnapped(){}
-
 }

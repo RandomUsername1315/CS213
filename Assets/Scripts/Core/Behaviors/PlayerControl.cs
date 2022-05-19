@@ -59,7 +59,7 @@ public class PlayerControl : AgentBehaviour
 
     }
     public void update() {
-        getComponent<GameMaanagerArrows>().level();
+       // GetComponent<GameManagerArrows>().level();
     }
 
     private void incrementScore(){
@@ -85,7 +85,7 @@ public class PlayerControl : AgentBehaviour
             //--lives;
             if(lives < 0){
                 //Ends the game if the player have not lives left
-                getComponent<GameMaanagerArrows>().gameOverMode();
+                GetComponent<GameManagerArrows>().gameOverMode();
             }
         }
         else if(other.gameObject.tag == "target"){
@@ -114,6 +114,7 @@ public class PlayerControl : AgentBehaviour
         base.OnCelluloTouchReleased(key);
         if (currState == PlayerState.loading){
             Vector3 position = transform.localPosition;
+
             
             currState = PlayerState.flying;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.white, 0);
@@ -128,31 +129,11 @@ public class PlayerControl : AgentBehaviour
 
     public void startGame(){
         currState = PlayerState.starting;
+        agent.isMoved = false;
         time = float.NaN;
     }
 
 
-/*    public override Steering GetSteering()
-    {
-        Steering steering = new Steering();
-        float horizontal = 0;
-        float vertical = 0;
-
-        // Gets the right Input, depending of the control mode
-        if (inputKeyboard == InputKeyboard.wasd){
-            horizontal = Input.GetAxis("Horizontal_FirstDog");
-            vertical = Input.GetAxis("Vertical_FirstDog");
-        } 
-        else if (inputKeyboard == InputKeyboard.arrows){
-            horizontal = Input.GetAxis("Horizontal_SecondDog");
-            vertical = Input.GetAxis("Vertical_SecondDog");
-        }
-        // Applies the input to the cellulo
-        steering.linear = new Vector3(horizontal, 0, vertical)* agent.maxAccel;
-        steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
-        return steering;
-    }*/
-    
        public override Steering GetSteering()
     {
         //the whole movement (and state control)is going to be controlled by this function 
@@ -161,11 +142,7 @@ public class PlayerControl : AgentBehaviour
 
         switch (currState){
             case PlayerState.waiting:
-                //print("Position" + transform.localPosition);
-                steering.linear = Vector3.zero;
-                steering.angular = 0f;
                 break;
-
             case PlayerState.flying:
                 if (position.x < startPoint.x){
                     steering.linear = force;
@@ -176,15 +153,14 @@ public class PlayerControl : AgentBehaviour
                     steering.linear = trajectory();
                     print("Temps: " + time + ", force: "+ steering.linear.ToString());
                }
-                
                 break;
             case PlayerState.starting:
+
                 Vector3 speed = new Vector3(0, 0, 0); 
                 speed.x = (-position.x + startPoint.x) / 20;
                 speed.z = (-position.z + startPoint.z) / 20;
                 steering.linear = maxedVect(speed) * agent.maxAccel * this.GetComponent<Rigidbody>().mass;
                 if (rightStartPos()){
-                    currState = PlayerState.loading;
                     steering.linear = Vector3.zero;
                     steering.angular = 0;
                     agent.SetSteering(steering);
@@ -193,6 +169,7 @@ public class PlayerControl : AgentBehaviour
                     agent.SetCasualBackdriveAssistEnabled(false);
                     agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
                     print("Now I'm playable");
+                    currState = PlayerState.loading;
                 }
                 break;
 

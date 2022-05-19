@@ -5,6 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class GameManagerArrows : MonoBehaviour
 {
+    public enum ManagerStates{
+        preparingLevel,
+        runningLevel,
+        endLevel,
+        endGame,
+        beforeStart
+    }
+    private
     public GameObject canvas;
     public GameObject winnerCanvas;
     
@@ -34,6 +42,7 @@ public class GameManagerArrows : MonoBehaviour
         canvas.SetActive(true);
         startCanvas.SetActive(true);
     }
+
 
     public void startGame(){
         if(!isRunning){
@@ -82,6 +91,19 @@ public class GameManagerArrows : MonoBehaviour
 
     private void setLevels(int levelNumber){
        PlayerPrefs.SetString("Level1", "level"+levelNumber);
+
     }
 
+    public Vector3 nextWallPosition(){
+
+        //Default before debug
+        return new Vector3(0.0f,0.0f,0.0f);
+    }
+
+    
+    public Vector3 nextTargetPosition(){
+
+        //Default before debug
+        return new Vector3(0.0f,0.0f,0.0f);
+    }
 }

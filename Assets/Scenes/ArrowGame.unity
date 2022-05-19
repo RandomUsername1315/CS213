@@ -1287,7 +1287,6 @@ GameObject:
   - component: {fileID: 956837706}
   - component: {fileID: 956837705}
   - component: {fileID: 956837704}
-  - component: {fileID: 956837703}
   m_Layer: 5
   m_Name: CanvasScore
   m_TagString: Untagged
@@ -1295,22 +1294,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &956837703
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 956837702}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57e35c506aede35f2a63cfc9fcbd9678, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timerText: {fileID: 1650848534}
-  slider: {fileID: 0}
-  maxMinutes: 2
-  gameManager: {fileID: 0}
 --- !u!114 &956837704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1575,7 +1558,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5260078371881903246, guid: 6f5f6d7624c2ce5cc8896e584e30f1c5, type: 3}
       propertyPath: m_Mass
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5260078371881903246, guid: 6f5f6d7624c2ce5cc8896e584e30f1c5, type: 3}
       propertyPath: m_UseGravity
@@ -3622,12 +3605,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1895966654}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bd02137807a945e29b8945ca375926f, type: 3}
+  m_Script: {fileID: 11500000, guid: b20508a00b159d559a1cf2cb13f4a2d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weight: 1
-  inputKeyboard: 1
-  name: MeKHell
+  inputKeyboard: 0
+  name: PlayerX
 --- !u!1 &1901673416
 GameObject:
   m_ObjectHideFlags: 0
