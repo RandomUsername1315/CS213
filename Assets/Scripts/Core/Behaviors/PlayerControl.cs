@@ -33,6 +33,9 @@ public class PlayerControl : AgentBehaviour
     
     private Vector3 force = Vector3.zero;
 
+    public GameManagerArrows manager;
+
+
     public PlayerState getState(){
         return currState;
     }
@@ -80,17 +83,18 @@ public class PlayerControl : AgentBehaviour
         // and the blocker must be in an active state
         else if(other.gameObject.tag == "blocker"){
             currState = PlayerState.starting;
-            //if(attackemodeOrSomethng){decreseScore()};
-            //and remove a life.
-            //--lives;
+            
+            if(other.gameObject.GetComponent<WallAndTarget>().isActive())
+            {--lives;}
             if(lives < 0){
                 //Ends the game if the player have not lives left
-                GetComponent<GameManagerArrows>().gameOverMode();
+                manager.gameOverMode();
             }
         }
         else if(other.gameObject.tag == "target"){
             incrementScore();            
             currState = PlayerState.starting;
+            manager.nextLevel();
 
         }
         else if(other.gameObject.tag == "wall"){

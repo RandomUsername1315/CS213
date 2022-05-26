@@ -12,7 +12,6 @@ public class GameManagerArrows : MonoBehaviour
         endGame,
         beforeStart
     }
-    private
     public GameObject canvas;
     public GameObject winnerCanvas;
     
@@ -23,6 +22,8 @@ public class GameManagerArrows : MonoBehaviour
     private int currLevel;
     public AudioSource audioSource;
     private bool isRunning;
+    private Vector3 WallPos;
+    private Vector3 TargetPos;
     private bool gameOver;
     // Start is called before the first frame update
     public void Start()
@@ -59,6 +60,11 @@ public class GameManagerArrows : MonoBehaviour
     public void nextLevel(){
         currLevel +=1;
         setLevels(currLevel);
+
+        // update the targets and movement of the cellulos
+
+
+
     }
     public int getLevel(){
         return currLevel;
@@ -97,13 +103,13 @@ public class GameManagerArrows : MonoBehaviour
     public Vector3 nextWallPosition(){
 
         //Default before debug
-        return new Vector3(0.0f,0.0f,0.0f);
+        return WallPos;
     }
 
     
     public Vector3 nextTargetPosition(){
 
         //Default before debug
-        return new Vector3(0.0f,0.0f,0.0f);
+        return TargetPos;
     }
 }
