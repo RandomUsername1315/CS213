@@ -15,16 +15,15 @@ public class WallAndTarget : AgentBehaviour
 
     private bool isactive = false;
 
-    public GameManagerArrows manager;
+    private GameManagerArrows manager;
 
     public void Start()
     {
         askForNextTarget();
-        
-        agent.SetGoalPose(target.x, target.y, 0, 20, 120);
-
-
+        agent.SetGoalPosition(target.x, target.y, agent.maxSpeed);
     }
+
+    //TODO : Le code est vraiment pas clair, surtout que l'on fait ce qui est interdit. Je peux faire des states ?
     private void Update()
     {
         //if it is withing a range then it needs to ask for a new position
@@ -75,13 +74,17 @@ public class WallAndTarget : AgentBehaviour
         So do not include commands to robots such as SetVisualEffect or SetBackdrivability for example to the robots in the update loops. Instead, have these commands only once on change. 
         */
 
-        if(nextTarget== target){
+        if(nextTarget==target){
             return false;
         }
         else{
             target = nextTarget;
             return true;
         }
+    }
+
+    public override OnGoalPoseReached(){
+        manager.imready(this);
     }
 
     //active means that the player looses points it it comes into contact with the blocker

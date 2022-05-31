@@ -5,13 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManagerArrows : MonoBehaviour
 {
-    public enum ManagerStates{
-        preparingLevel,
-        runningLevel,
-        endLevel,
-        endGame,
-        beforeStart
-    }
     public GameObject canvas;
     public GameObject winnerCanvas;
     
@@ -25,6 +18,7 @@ public class GameManagerArrows : MonoBehaviour
     private Vector3 WallPos;
     private Vector3 TargetPos;
     private bool gameOver;
+    private AgentBehaviour[] readyChars  = new AgentBehaviour[]{}; 
     // Start is called before the first frame update
     public void Start()
     {
@@ -45,12 +39,17 @@ public class GameManagerArrows : MonoBehaviour
     }
 
 
+    public void prepareLevel(){
+
+    }
+
     public void startGame(){
         if(!isRunning){
             isRunning = true;
             startCanvas.SetActive(false);
         }
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().startGame();
+        currLevel = 1;
+        prepareLevel(currLevel);
     }
 
     public bool isGameRunning(){
@@ -60,11 +59,7 @@ public class GameManagerArrows : MonoBehaviour
     public void nextLevel(){
         currLevel +=1;
         setLevels(currLevel);
-
         // update the targets and movement of the cellulos
-
-
-
     }
     public int getLevel(){
         return currLevel;
@@ -98,6 +93,22 @@ public class GameManagerArrows : MonoBehaviour
     private void setLevels(int levelNumber){
        PlayerPrefs.SetString("Level1", "level"+levelNumber);
 
+    }
+
+    // Called by each cellulos when it is at the right place and ready to start
+    public void imready(AgentBehaviour character){
+        bool alreadyPresent = false;
+        foreach (AgentBehaviour char in readyChars){
+            if (character == char){
+                alreadyPresent = true;
+            }
+        }
+        if (!alreadyPresent) {
+            readyChars.Add(character);
+        }
+        if (readyChars.Length == 3){
+            startGame();
+        }
     }
 
     public Vector3 nextWallPosition(){

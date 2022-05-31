@@ -33,7 +33,7 @@ public class PlayerControl : AgentBehaviour
     
     private Vector3 force = Vector3.zero;
 
-    public GameManagerArrows manager;
+    private GameManagerArrows manager;
 
 
     public PlayerState getState(){
@@ -42,6 +42,7 @@ public class PlayerControl : AgentBehaviour
 
 
     public void Start(){
+        manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerArrows>();
         Color playerColor;
         int color = 0;
         //Player 1
@@ -56,34 +57,29 @@ public class PlayerControl : AgentBehaviour
         else{
             playerColor = Color.blue;
         }
-   //     this.GetComponentInParent<AudioSource>().volume = PlayerPrefs.GetFloat("Volume", this.GetComponentInParent<AudioSource>().volume);
         agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, playerColor, 0);
         agent.isMoved = false;
 
     }
-    public void update() {
-       // GetComponent<GameManagerArrows>().level();
-    }
 
+    // Toolbox
     private void incrementScore(){
         score +=1;
     }
-    private void decreaseScore(){
-        score -=1;
-    }
 
+    // Public getter
     public int livesLeft(){
         return lives;
     }
 
     void OnCollisionEnter(Collision other) {
-        if (GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerArrows>().isGameRunning()){
-            return;
-        } 
+        // Guard: this functions does not do anything if the game is not running
+        if (!manager.isGameRunning()){return;} 
+
         // and the blocker must be in an active state
-        else if(other.gameObject.tag == "blocker"){
+        if(other.gameObject.tag == "blocker"){
             currState = PlayerState.starting;
-            
+
             if(other.gameObject.GetComponent<WallAndTarget>().isActive())
             {--lives;}
             if(lives < 0){
@@ -98,27 +94,27 @@ public class PlayerControl : AgentBehaviour
 
         }
         else if(other.gameObject.tag == "wall"){
-            //Reset
             currState = PlayerState.starting;
         }
 
     }
     
+    // Starts the game (not each level but at the beginning)
     public override void OnCelluloLongTouch(int val){
         base.OnCelluloLongTouch(val);
-        GameManagerArrows manager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerArrows>();
         if (manager.isGameRunning() == false){
+            // This is not a local startGame
             manager.startGame();
             currState = PlayerState.starting;
         } 
     }
 
+    // Starts the game when we touch the top of the cellulo. Computes the force too.
     public override void OnCelluloTouchReleased(int key)
     {
         base.OnCelluloTouchReleased(key);
         if (currState == PlayerState.loading){
             Vector3 position = transform.localPosition;
-
             
             currState = PlayerState.flying;
             agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.white, 0);
@@ -131,10 +127,26 @@ public class PlayerControl : AgentBehaviour
         }
     }
 
-    public void startGame(){
+    // Prepares the next level by moving the cellulos to the right position
+    public void prepareLevel(){
         currState = PlayerState.starting;
-        agent.isMoved = false;
+        agent.setGoalPosition(startPoint.x, startPoint.z, agent.maxSpeed);
         time = float.NaN;
+    }
+
+
+    // Starts the game when all cellulos are ready. Called by the Game Manager
+    public void startGame(){
+        currState = PlayerState.loading;
+        agent.isMoved = true;
+        agent.ClearHapticFeedback();
+        agent.SetCasualBackdriveAssistEnabled(false);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.Blue, 0);
+    }
+
+    // Notifies the GameManager that this cellulo is ready to play
+    public override OnGoalPoseReached(){
+        manager.imready(this);
     }
 
 
@@ -146,11 +158,13 @@ public class PlayerControl : AgentBehaviour
 
         switch (currState){
             case PlayerState.waiting:
+            case PlayerState.starting:
                 break;
             case PlayerState.flying:
                 if (position.x < startPoint.x){
                     steering.linear = force;
                 } else {
+                    // This trick is done to compute the gravity only the right of the brown line.
                     if (float.IsNaN(time)){
                         time = Time.time;
                     }
@@ -158,6 +172,7 @@ public class PlayerControl : AgentBehaviour
                     print("Temps: " + time + ", force: "+ steering.linear.ToString());
                }
                 break;
+            /* Deleted following the API change
             case PlayerState.starting:
 
                 Vector3 speed = new Vector3(0, 0, 0); 
@@ -175,7 +190,7 @@ public class PlayerControl : AgentBehaviour
                     print("Now I'm playable");
                     currState = PlayerState.loading;
                 }
-                break;
+                break;*/
 
             case PlayerState.loading:
                 float horizontal = Input.GetAxis("Horizontal_SecondDog");
@@ -191,6 +206,8 @@ public class PlayerControl : AgentBehaviour
     }
 
 
+
+
     //time is when the player is first launched
     private Vector3 trajectory(){
         float timeDiff = Time.time - time;
@@ -201,12 +218,12 @@ public class PlayerControl : AgentBehaviour
 
         return nextPos;
     }
-
+    /* Deleted following the API change
     private bool rightStartPos(){
         UnityEngine.Vector3 pos = transform.localPosition;
         double distance = Math.Sqrt((pos.x - startPoint.x) * (pos.x - startPoint.x) + (pos.z - startPoint.z) * (pos.z - startPoint.z));
         return distance < maxDeltaDistance;
-    }
+    }*/
 
     private Vector3 maxedVect(Vector3 vect){
         float mag =  vect.magnitude;
