@@ -10,17 +10,32 @@ public enum WallTargetState
 
 public class WallAndTarget : AgentBehaviour
 {
+    private bool isMoving;
     private Vector3 target;
+    private Vector3 moveTarget;
     public WallTargetState state = 0;
+    private bool preparingLevel = false;
 
-    private bool isactive = false;
+    // Whether the wall is a standard wall or implies loss of lives
+    private bool isActive = false;
 
     private GameManagerArrows manager;
 
-    public void Start()
-    {
-        askForNextTarget();
-        agent.SetGoalPosition(target.x, target.y, agent.maxSpeed);
+    public void Start(){
+        manager =  GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManagerArrows>();
+    }
+
+    public void setLevel(bool isTarget, bool active, bool moving, Vector3 pos1, Vector3 pos2){
+        preparingLevel = true;
+        state = (isTarget) ? WallTargetState.target : WallTargetState.state;
+        target = pos2;
+        moveTarget = pos1;
+        isMoving = moving;
+        isActive = active;
+
+        Color playerColor = (isTarget) ? Color.green : ((active) ? Color.red: Color.black);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, playerColor, 0);
+        agent.SetGoalPose(pos1.x, pos1.z, agent.maxSpeed);
     }
 
     //TODO : Le code est vraiment pas clair, surtout que l'on fait ce qui est interdit. Je peux faire des states ?
@@ -84,7 +99,13 @@ public class WallAndTarget : AgentBehaviour
     }
 
     public override OnGoalPoseReached(){
-        manager.imready(this);
+        if (preparingLevel){
+            manager.imready(this);
+            preparingLevel = false;
+        } else {
+            
+        }
+        
     }
 
     //active means that the player looses points it it comes into contact with the blocker
