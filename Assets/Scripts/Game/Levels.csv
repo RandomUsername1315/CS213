@@ -1,0 +1,4 @@
+%This is the file where all levels are quickly defined. Just add a line and recompile the game. Booleans are translated as such that a strictly positive is true and anything else is false
+%gravity[0], movingTarget[1], targetX[2], targetZ[3], moveTargetX[4], moveTargetZ[5], activeWall[6], movingWall[7], WallPosX[8], WallPosZ[9], WallMovePosX[10], wallMovePosZ[11]
+%float, bool, float, float, float, float, bool, bool, float, float, float, float
+9.81, 0, 9.11, -3.14, 0, 0, 0, 0, 13.36, -0.8, 0, 0 
