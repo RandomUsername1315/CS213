@@ -42,23 +42,22 @@ public class WallAndTarget : AgentBehaviour
 
     public override Steering GetSteering()
     {
-        Steering steering = new Steering();
-        Vector3 position = transform.localPosition;
-        if (rightPos() && isMoving){
-            Vector3 tmp = target;
-            target = nextTarget;
-            nextTarget = tmp;
+        if (isMoving){
+            Steering steering = new Steering();
+            Vector3 position = transform.localPosition;
+            if (rightPos()){
+                Vector3 tmp = target;
+                target = nextTarget;
+                nextTarget = tmp;
+            }
+            Vector3 speed = new Vector3(0, 0, 0);
+            speed.x = -position.x + target.x;
+            speed.z = -position.z + target.z;
+            steering.linear =  Vector3.ClampMagnitude(speed, agent.maxAccel);
+            return steering;
+        } else {
+            return new Steering();
         }
-        Vector3 speed = new Vector3(0, 0, 0);
-        speed.x = -position.x + target.x;
-        speed.z = -position.z + target.z;
-
-        
-        steering.linear =  Vector3.ClampMagnitude(speed, agent.maxAccel);
-
-
-
-        return steering;
 
     }
     
