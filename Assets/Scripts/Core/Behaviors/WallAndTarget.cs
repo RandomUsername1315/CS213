@@ -35,8 +35,15 @@ public class WallAndTarget : AgentBehaviour
         isMoving = moving;
         this.active = active;
 
-        Color playerColor = (isTarget) ? Color.blue : ((active) ? Color.red: Color.black);
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, playerColor, 0);
+        Color color;
+        if(isTarget){
+            color = Color.blue;
+        }
+        else{
+            color = Color.red;
+        }
+
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, color, 0);
         agent.SetGoalPosition(pos1.x, pos1.z,agent.maxSpeed);
     }
 

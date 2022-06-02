@@ -74,6 +74,7 @@ public class PlayerControl : AgentBehaviour
         pointsCounter.text = score.ToString();
         livesCounter.text = lives.ToString();
 
+        print(currState);
 
     }
 
@@ -91,12 +92,17 @@ public class PlayerControl : AgentBehaviour
         // Guard: this functions does not do anything if the game is not running
         if (!manager.isGameRunning()){return;} 
 
+        print("Collision with " + other.gameObject.tag);
+
         // and the blocker must be in an active state
         if(other.gameObject.tag == "Dog"){
             currState = PlayerState.starting;
 
             if(other.gameObject.GetComponent<WallAndTarget>().isActive())
-            {--lives;}
+            {
+                prepareLevel();
+
+                --lives;}
             if(lives < 0){
                 //Ends the game if the player have not lives left
                 manager.gameOverMode();
@@ -108,9 +114,11 @@ public class PlayerControl : AgentBehaviour
             manager.nextLevel();
 
         }
-        else if(other.gameObject.tag == "wall"){
-            currState = PlayerState.starting;
+        else if(other.gameObject.tag == "Border"){
+            prepareLevel();
         }
+        
+
 
     }
     
@@ -143,6 +151,7 @@ public class PlayerControl : AgentBehaviour
     }
 
     // Prepares the next level by moving the cellulos to the right position
+    //More like reset cellulo to its starting place
     public void prepareLevel(){
         currState = PlayerState.starting;
         time = float.NaN;
@@ -176,6 +185,9 @@ public class PlayerControl : AgentBehaviour
         switch (currState){
             case PlayerState.waiting:
             case PlayerState.starting:
+                if(startPoint == transform.localPosition){
+                    currState = PlayerState.loading; 
+                }
                 break;
             case PlayerState.flying:
                 if (position.x < startPoint.x){
