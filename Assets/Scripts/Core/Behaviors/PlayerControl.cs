@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI; // Don't forget this line
 
 //agent
 //Input Keys
@@ -22,10 +23,17 @@ public class PlayerControl : AgentBehaviour
     public string name = "PlayerX";
     private PlayerState  currState = PlayerState.waiting;
 
+    public Text pointsCounter;
+
+    public Text livesCounter;
+
+
     private static float maxDeltaDistance = 0.1f;
     private static Vector3 startPoint = new Vector3(2.827304f, 0, -5.000934f);
 
     private int lives = 3;
+
+
 
     private int score = 0;
 
@@ -62,6 +70,13 @@ public class PlayerControl : AgentBehaviour
 
     }
 
+    private void Update(){
+        pointsCounter.text = score.ToString();
+        livesCounter.text = lives.ToString();
+
+
+    }
+
     // Toolbox
     private void incrementScore(){
         score +=1;
@@ -77,7 +92,7 @@ public class PlayerControl : AgentBehaviour
         if (!manager.isGameRunning()){return;} 
 
         // and the blocker must be in an active state
-        if(other.gameObject.tag == "blocker"){
+        if(other.gameObject.tag == "Dog"){
             currState = PlayerState.starting;
 
             if(other.gameObject.GetComponent<WallAndTarget>().isActive())
@@ -87,7 +102,7 @@ public class PlayerControl : AgentBehaviour
                 manager.gameOverMode();
             }
         }
-        else if(other.gameObject.tag == "target"){
+        else if(other.gameObject.tag == "Sheep"){
             incrementScore();            
             currState = PlayerState.starting;
             manager.nextLevel();
@@ -117,7 +132,7 @@ public class PlayerControl : AgentBehaviour
             Vector3 position = transform.localPosition;
             
             currState = PlayerState.flying;
-            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.white, 0);
+            agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.yellow, 0);
             agent.isMoved = false;
 
             Vector3 baseForce = new Vector3( startPoint.x - position.x, 0, startPoint.z - position.z);
@@ -130,8 +145,8 @@ public class PlayerControl : AgentBehaviour
     // Prepares the next level by moving the cellulos to the right position
     public void prepareLevel(){
         currState = PlayerState.starting;
-        agent.setGoalPosition(startPoint.x, startPoint.z, agent.maxSpeed);
         time = float.NaN;
+        agent.SetGoalPosition(startPoint.x, startPoint.z,agent.maxSpeed); 
     }
 
 
@@ -141,12 +156,14 @@ public class PlayerControl : AgentBehaviour
         agent.isMoved = true;
         agent.ClearHapticFeedback();
         agent.SetCasualBackdriveAssistEnabled(false);
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.Blue, 0);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
     }
 
     // Notifies the GameManager that this cellulo is ready to play
-    public override OnGoalPoseReached(){
-        manager.imready(this);
+    public void OnGoalPoseReached(){
+        if (currState == PlayerState.starting){
+            manager.imready(this);
+        }
     }
 
 

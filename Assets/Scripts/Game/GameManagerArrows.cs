@@ -1,8 +1,10 @@
-using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+
 
 public class GameManagerArrows : MonoBehaviour
 {
@@ -35,7 +37,7 @@ public class GameManagerArrows : MonoBehaviour
             return new Vector3(vals[10], 0, vals[11]);
         }}
 
-        public Level(float values){
+        public Level(float[] values){
             vals = values;
         }
     }
@@ -54,7 +56,7 @@ public class GameManagerArrows : MonoBehaviour
     private Vector3 TargetPos;
     private bool gameOver;
     private Level[] levels = new Level[]{};
-    private AgentBehaviour[] readyChars  = new AgentBehaviour[]{}; 
+    private List<AgentBehaviour> readyChars  = new List<AgentBehaviour>(); 
     // Start is called before the first frame update
     public void Start()
     {
@@ -62,7 +64,7 @@ public class GameManagerArrows : MonoBehaviour
         audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;
         gameOver = false;
-        currLevel = 1;
+        currLevel = 0;
         if (PlayerPrefs.GetInt("MusicEnable", 1) == 1){
             audioSource.enabled = true;
             audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
@@ -79,29 +81,32 @@ public class GameManagerArrows : MonoBehaviour
         for Boolean values, positive = true
     */
     private Level[] getLevels(){
-        string[] csvLines = File.ReadAllLines("Levels.csv");
-        foreach (string line in lines)
+        List<Level> levels = new List<Level>();
+        string[] csvLines = File.ReadAllLines("Assets/Scripts/Game/Levels.csv");
+        foreach (string line in csvLines)
         {
             // allows commented lines using the % character
             if (line[0] != '%'){
-                float[] vals = from val in line.Split(",") select float.Parse(val);
-                Level level = new Level(vals);
-                levels.Add(vals);
-            }
+                float[] vals =(from val in (line.Split(',')) select float.Parse(val)).ToArray();
+                levels.Add(new Level(vals));
+            } 
         }
-
-
+        return levels.ToArray();
     }
 
-// TODO: not finished
     public void prepareLevel(){
                 Level level = levels[currLevel];
-                Physics.gravity.z = vals.gravity;
-                FindGameObjectsWithTag("Dog").GetComponent<WallAndTarget>()
-                .setLevel();
-                FindGameObjectsWithTag("Sheep").GetComponent<WallAndTarget>()
-                .setLevel(false, vals)
+                //vector3d
+                Physics.gravity = new Vector3(0,0,level.gravity);
 
+                // Communicates the start to cellulos
+                GameObject.FindGameObjectWithTag("Dog").GetComponent<WallAndTarget>()
+                .setLevel(false, level.activeWall, level.movingWall, level.wallPos, level.wallPosMove);
+
+                GameObject.FindGameObjectWithTag("Sheep").GetComponent<WallAndTarget>()
+                .setLevel(true, false, level.movingTarget, level.targetPos, level.targetPosMove);
+                
+                GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().prepareLevel();
     }
 
     public void startGame(){
@@ -109,8 +114,8 @@ public class GameManagerArrows : MonoBehaviour
             isRunning = true;
             startCanvas.SetActive(false);
         }
-        currLevel = 1;
-        prepareLevel(currLevel);
+        currLevel = 0;
+        prepareLevel();
     }
 
     public bool isGameRunning(){
@@ -159,17 +164,20 @@ public class GameManagerArrows : MonoBehaviour
     // Called by each cellulos when it is at the right place and ready to start
     public void imready(AgentBehaviour character){
         bool alreadyPresent = false;
-        foreach (AgentBehaviour char in readyChars){
-            if (character == char){
+        foreach (AgentBehaviour charact in readyChars){
+            if (character == charact){
                 alreadyPresent = true;
             }
         }
-        if (!alreadyPresent) {
+        print(alreadyPresent);
+        if (!alreadyPresent){
+            print(readyChars.Count());
             readyChars.Add(character);
         }
-        if (readyChars.Length == 3){
+        if (readyChars.Count == 3){
             readyChars.Clear();
-            startGame();
+            // Start the level
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().startGame();
         }
     }
 
