@@ -74,8 +74,6 @@ public class PlayerControl : AgentBehaviour
         pointsCounter.text = score.ToString();
         livesCounter.text = lives.ToString();
 
-        print(currState);
-
     }
 
     // Toolbox
@@ -91,8 +89,6 @@ public class PlayerControl : AgentBehaviour
     void OnCollisionEnter(Collision other) {
         // Guard: this functions does not do anything if the game is not running
         if (!manager.isGameRunning()){return;} 
-
-        print("Collision with " + other.gameObject.tag);
 
         // and the blocker must be in an active state
         if(other.gameObject.tag == "Dog"){
@@ -112,9 +108,11 @@ public class PlayerControl : AgentBehaviour
             incrementScore();            
             currState = PlayerState.starting;
             manager.nextLevel();
+            prepareLevel();
+
 
         }
-        else if(other.gameObject.tag == "Border"){
+        else if(other.gameObject.tag == "Border" && currState != PlayerState.loading){
             prepareLevel();
         }
         
@@ -144,9 +142,10 @@ public class PlayerControl : AgentBehaviour
             agent.isMoved = false;
 
             Vector3 baseForce = new Vector3( startPoint.x - position.x, 0, startPoint.z - position.z);
-            print(baseForce + " with magnitude " + baseForce.magnitude);
+            // print(baseForce + " with magnitude " + baseForce.magnitude);
             force.x = baseForce.x * baseForce.magnitude / startPoint.magnitude * agent.maxAccel * this.GetComponent<Rigidbody>().mass; 
             force.z = baseForce.z * baseForce.magnitude / startPoint.magnitude * agent.maxAccel *this.GetComponent<Rigidbody>().mass;
+
         }
     }
 
@@ -155,7 +154,9 @@ public class PlayerControl : AgentBehaviour
     public void prepareLevel(){
         currState = PlayerState.starting;
         time = float.NaN;
-        agent.SetGoalPosition(startPoint.x, startPoint.z,agent.maxSpeed); 
+        agent.SetGoalPosition(startPoint.x, startPoint.z,agent.maxSpeed);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+ 
     }
 
 
@@ -186,7 +187,7 @@ public class PlayerControl : AgentBehaviour
             case PlayerState.waiting:
             case PlayerState.starting:
                 if(startPoint == transform.localPosition){
-                    currState = PlayerState.loading; 
+                    currState = PlayerState.loading;
                 }
                 break;
             case PlayerState.flying:
@@ -198,7 +199,7 @@ public class PlayerControl : AgentBehaviour
                         time = Time.time;
                     }
                     steering.linear = trajectory();
-                    print("Temps: " + time + ", force: "+ steering.linear.ToString());
+                    // print("Temps: " + time + ", force: "+ steering.linear.ToString());
                }
                 break;
             /* Deleted following the API change
@@ -226,12 +227,39 @@ public class PlayerControl : AgentBehaviour
                 float vertical = Input.GetAxis("Vertical_SecondDog");
                 steering.linear = new Vector3(horizontal, 0, vertical)* agent.maxAccel * this.GetComponent<Rigidbody>().mass;
                 steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
+                loadingLeds();
+
                 if (Input.GetKeyDown(KeyCode.Return)){
                     OnCelluloTouchReleased(0);
                 }
                 break;
         }
+
         return steering;
+    }
+
+    private void loadingLeds(){
+        
+        //Maye 50 is the threshold 
+        float percentageOfMax = (transform.localPosition - startPoint).magnitude / 4.0f;
+
+        int forceStrength = (int)(percentageOfMax*6);
+        
+        if(forceStrength > 6){
+            agent.SetVisualEffectSimulated(VisualEffect.VisualEffectBlink, Color.black, 0);
+            return;
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            if(i<forceStrength){
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.red, i);
+            }
+            else{
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.white, i);
+
+            }
+        }
     }
 
 
