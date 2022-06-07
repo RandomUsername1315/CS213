@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI; // Don't forget this line
@@ -72,8 +73,7 @@ public class PlayerControl : AgentBehaviour
 
     private void Update(){
         pointsCounter.text = score.ToString();
-        livesCounter.text = lives.ToString();
-
+        //livesCounter.text = lives.ToString();
     }
 
     // Toolbox
@@ -94,11 +94,14 @@ public class PlayerControl : AgentBehaviour
         if(other.gameObject.tag == "Dog"){
             currState = PlayerState.starting;
 
-            if(other.gameObject.GetComponent<WallAndTarget>().isActive())
-            {
-                prepareLevel();
-
-                --lives;}
+            if(other.gameObject.GetComponent<WallAndTarget>().isActive()){
+                manager.resetLevel();
+                --lives;
+            } else {
+                ContactPoint point = other.GetContact(0);
+                time = Time.time;
+                force = Vector3.Normalize(point.normal) * force.magnitude;
+            }
             if(lives < 0){
                 //Ends the game if the player have not lives left
                 manager.gameOverMode();
@@ -108,12 +111,10 @@ public class PlayerControl : AgentBehaviour
             incrementScore();            
             currState = PlayerState.starting;
             manager.nextLevel();
-            prepareLevel();
-
-
         }
+
         else if(other.gameObject.tag == "Border" && currState != PlayerState.loading){
-            prepareLevel();
+            manager.resetLevel();
         }
         
 
@@ -177,7 +178,7 @@ public class PlayerControl : AgentBehaviour
     }
 
 
-       public override Steering GetSteering()
+    public override Steering GetSteering()
     {
         //the whole movement (and state control)is going to be controlled by this function 
         Steering steering = new Steering();
@@ -240,23 +241,23 @@ public class PlayerControl : AgentBehaviour
 
     private void loadingLeds(){
         
-        //Maye 50 is the threshold 
+        //Maybe 50 is the threshold 
         float percentageOfMax = (transform.localPosition - startPoint).magnitude / 4.0f;
 
         int forceStrength = (int)(percentageOfMax*6);
         
         if(forceStrength > 6){
-            agent.SetVisualEffectSimulated(VisualEffect.VisualEffectBlink, Color.black, 0);
+            agent.SetVisualEffectSimulated(VisualEffect.VisualEffectBlink, Color.white, 0);
             return;
         }
 
         for (int i = 0; i < 6; i++)
         {
-            if(i<forceStrength){
+            if(i < forceStrength){
                 agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.red, i);
             }
             else{
-                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.white, i);
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.black, i);
 
             }
         }
@@ -268,12 +269,12 @@ public class PlayerControl : AgentBehaviour
     //time is when the player is first launched
     private Vector3 trajectory(){
         float timeDiff = Time.time - time;
-        Vector3 nextPos = new Vector3(0,0,0);
+        Vector3 nextForce = new Vector3(0,0,0);
 
-        nextPos.x = (float) (force.x);
-        nextPos.z = (float) (force.z + Physics.gravity.z * timeDiff * this.GetComponent<Rigidbody>().mass); 
+        nextForce.x = (float) (force.x);
+        nextForce.z = (float) (force.z + Physics.gravity.z * timeDiff * this.GetComponent<Rigidbody>().mass); 
 
-        return nextPos;
+        return nextForce;
     }
     /* Deleted following the API change
     private bool rightStartPos(){

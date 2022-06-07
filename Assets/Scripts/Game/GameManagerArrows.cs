@@ -94,7 +94,7 @@ public class GameManagerArrows : MonoBehaviour
         return levels.ToArray();
     }
 
-    public void prepareLevel(){
+    private void prepareLevel(){
                 Level level = levels[currLevel];
                 //vector3d
                 Physics.gravity = new Vector3(0,0,level.gravity);
@@ -122,9 +122,14 @@ public class GameManagerArrows : MonoBehaviour
         return isRunning;
     }
 
+    public void resetLevel(){
+        prepareLevel();
+    }
+
     public void nextLevel(){
         currLevel +=1;
         setLevels(currLevel);
+        prepareLevel();
         // update the targets and movement of the cellulos
     }
     public int getLevel(){
