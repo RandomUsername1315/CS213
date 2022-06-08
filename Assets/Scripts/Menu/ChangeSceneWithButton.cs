@@ -5,16 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class ChangeSceneWithButton : MonoBehaviour
 {
-    public void LoadScene(string scenename)
+    public void LoadScene(string name)
     {
-        if(scenename != "SpaceGhostSheepGame"){
-            PlayerPrefs.SetString("Level", "level1");}
-        else{
-            PlayerPrefs.SetString("Level", scenename);
-            }
+        if (name != null){
+            SceneManager.LoadScene(name);
+        } else {
+            SceneManager.LoadScene("ArrowGame");
+        }
         
-        SceneManager.LoadScene("ArrowGame");
-
-
     }
 }

@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.UI; // Don't forget this line
+using UnityEngine.UI;// Don't forget this line
 
-//agent
+
+/*agent
 //Input Keys
 public enum InputKeyboard2{
     arrows =0,
     wasd = 1
-}
+}*/
 
 public enum PlayerState
 {
@@ -41,6 +42,7 @@ public class PlayerControl : AgentBehaviour
     private float time = float.NaN;
     
     private Vector3 force = Vector3.zero;
+    private bool bounced = false;
 
     private GameManagerArrows manager;
 
@@ -55,7 +57,7 @@ public class PlayerControl : AgentBehaviour
         Color playerColor;
         int color = 0;
         //Player 1
-        inputKeyboard = (InputKeyboard)PlayerPrefs.GetInt("displacement1", 0);
+        inputKeyboard = (InputKeyboard) PlayerPrefs.GetInt("displacement1", 0);
         color = PlayerPrefs.GetInt("color1", 0);                 
         if(color == 0){
             playerColor = Color.red;
@@ -72,13 +74,16 @@ public class PlayerControl : AgentBehaviour
     }
 
     private void Update(){
-        pointsCounter.text = score.ToString();
-        //livesCounter.text = lives.ToString();
+        pointsCounter.text = string.Format("Points : {0}\nLifes : {1}" , score.ToString(), lives.ToString());
     }
 
     // Toolbox
     private void incrementScore(){
         score +=1;
+    }
+
+    public int getScore(){
+        return score;
     }
 
     // Public getter
@@ -88,32 +93,32 @@ public class PlayerControl : AgentBehaviour
 
     void OnCollisionEnter(Collision other) {
         // Guard: this functions does not do anything if the game is not running
-        if (!manager.isGameRunning()){return;} 
+        if (!manager.isGameRunning() || currState != PlayerState.flying){return;} 
 
         // and the blocker must be in an active state
         if(other.gameObject.tag == "Dog"){
-            currState = PlayerState.starting;
-
             if(other.gameObject.GetComponent<WallAndTarget>().isActive()){
+                currState = PlayerState.starting;
                 manager.resetLevel();
                 --lives;
             } else {
+                bounced = true;
                 ContactPoint point = other.GetContact(0);
                 time = Time.time;
-                force = Vector3.Normalize(point.normal) * force.magnitude;
+                print (time);
+                force = Vector3.Normalize(point.normal) * trajectory().magnitude;
+                print(force);
             }
             if(lives < 0){
                 //Ends the game if the player have not lives left
                 manager.gameOverMode();
             }
-        }
-        else if(other.gameObject.tag == "Sheep"){
+        } else if(other.gameObject.tag == "Sheep"){
             incrementScore();            
             currState = PlayerState.starting;
             manager.nextLevel();
-        }
-
-        else if(other.gameObject.tag == "Border" && currState != PlayerState.loading){
+        } else if(other.gameObject.tag == "Border"){
+            currState = PlayerState.starting;
             manager.resetLevel();
         }
         
@@ -153,10 +158,11 @@ public class PlayerControl : AgentBehaviour
     // Prepares the next level by moving the cellulos to the right position
     //More like reset cellulo to its starting place
     public void prepareLevel(){
+        bounced = false;
         currState = PlayerState.starting;
         time = float.NaN;
         agent.SetGoalPosition(startPoint.x, startPoint.z,agent.maxSpeed);
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.blue, 0);
+        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, Color.red, 0);
  
     }
 
@@ -192,7 +198,7 @@ public class PlayerControl : AgentBehaviour
                 }
                 break;
             case PlayerState.flying:
-                if (position.x < startPoint.x){
+                if (position.x < startPoint.x && !bounced){
                     steering.linear = force;
                 } else {
                     // This trick is done to compute the gravity only the right of the brown line.
@@ -200,12 +206,11 @@ public class PlayerControl : AgentBehaviour
                         time = Time.time;
                     }
                     steering.linear = trajectory();
-                    // print("Temps: " + time + ", force: "+ steering.linear.ToString());
-               }
+                    if (steering.linear.magnitude < 0.05f){manager.resetLevel();} 
+                }
                 break;
             /* Deleted following the API change
-            case PlayerState.starting:
-
+[ui]
                 Vector3 speed = new Vector3(0, 0, 0); 
                 speed.x = (-position.x + startPoint.x) / 20;
                 speed.z = (-position.z + startPoint.z) / 20;
@@ -224,8 +229,12 @@ public class PlayerControl : AgentBehaviour
                 break;*/
 
             case PlayerState.loading:
-                float horizontal = Input.GetAxis("Horizontal_SecondDog");
-                float vertical = Input.GetAxis("Vertical_SecondDog");
+                if (position.x > startPoint.x + 0.2){
+                    steering.linear = new Vector3(-agent.maxAccel, 0, 0);
+                    break;
+                }
+                float horizontal = Input.GetAxis((inputKeyboard == InputKeyboard.wasd) ? "Horizontal_FirstDog" : "Horizontal_SecondDog");
+                float vertical = Input.GetAxis((inputKeyboard == InputKeyboard.wasd) ? "Vertical_FirstDog" : "Vertical_SecondDog");
                 steering.linear = new Vector3(horizontal, 0, vertical)* agent.maxAccel * this.GetComponent<Rigidbody>().mass;
                 steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
                 loadingLeds();
@@ -240,14 +249,12 @@ public class PlayerControl : AgentBehaviour
     }
 
     private void loadingLeds(){
-        
         //Maybe 50 is the threshold 
         float percentageOfMax = (transform.localPosition - startPoint).magnitude / 4.0f;
-
         int forceStrength = (int)(percentageOfMax*6);
         
         if(forceStrength > 6){
-            agent.SetVisualEffectSimulated(VisualEffect.VisualEffectBlink, Color.white, 0);
+            agent.SetVisualEffect(VisualEffect.VisualEffectBlink, Color.white, 20);
             return;
         }
 
@@ -255,16 +262,11 @@ public class PlayerControl : AgentBehaviour
         {
             if(i < forceStrength){
                 agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.red, i);
-            }
-            else{
-                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.black, i);
-
+            } else{
+                agent.SetVisualEffect(VisualEffect.VisualEffectConstSingle,Color.white, i);
             }
         }
     }
-
-
-
 
     //time is when the player is first launched
     private Vector3 trajectory(){
@@ -273,7 +275,7 @@ public class PlayerControl : AgentBehaviour
 
         nextForce.x = (float) (force.x);
         nextForce.z = (float) (force.z + Physics.gravity.z * timeDiff * this.GetComponent<Rigidbody>().mass); 
-
+        print(nextForce);
         return nextForce;
     }
     /* Deleted following the API change
@@ -293,6 +295,4 @@ public class PlayerControl : AgentBehaviour
         vect.z = vect.z / mag;
         return vect;
     }
-
-
 }

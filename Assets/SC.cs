@@ -4,14 +4,6 @@ using UnityEngine;
 
 public class SC : MonoBehaviour
 {
-    public TMPro.TMP_Dropdown DisplacementDD;
-
-    void Start()
-    {
-        int Displacement = PlayerPrefs.GetInt("displacement1", 0);
-        DisplacementDD.value = Displacement;
-    }
-
     public void SetDisplacement(int displacementIndex)
     {
         PlayerPrefs.SetInt("displacement1", displacementIndex);

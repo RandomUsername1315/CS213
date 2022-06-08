@@ -44,7 +44,8 @@ public class WallAndTarget : AgentBehaviour
             color = Color.red;
         }*/
 
-        agent.SetVisualEffect(VisualEffect.VisualEffectConstAll, color, 0);
+        agent.SetVisualEffect((active && state == WallTargetState.wall) ? VisualEffect.VisualEffectBlink : VisualEffect.VisualEffectConstAll, color, 100);
+
         agent.SetGoalPosition(pos1.x, pos1.z,agent.maxSpeed);
     }
 

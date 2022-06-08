@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManagerArrows : MonoBehaviour
 {
+    // Class with custom getters to efficiently represent Levels
     private class Level{
         // cf. https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/properties
         private float[] vals;
@@ -44,13 +45,12 @@ public class GameManagerArrows : MonoBehaviour
 
     public GameObject canvas;
     public GameObject winnerCanvas;
-    
     public GameObject startCanvas;
-
-    public Text text;
+    public Text winnerText;
+    public Text levelText;
+    public AudioSource audioSource;
 
     private int currLevel;
-    public AudioSource audioSource;
     private bool isRunning;
     private Vector3 WallPos;
     private Vector3 TargetPos;
@@ -65,6 +65,7 @@ public class GameManagerArrows : MonoBehaviour
         isRunning = false;
         gameOver = false;
         currLevel = 0;
+        levelText.text = string.Format("Level {0} \nGravity: {1:0.##}", currLevel + 1, -levels[currLevel].gravity);
         if (PlayerPrefs.GetInt("MusicEnable", 1) == 1){
             audioSource.enabled = true;
             audioSource.volume = PlayerPrefs.GetFloat("Volume", audioSource.volume);
@@ -107,6 +108,7 @@ public class GameManagerArrows : MonoBehaviour
                 .setLevel(true, false, level.movingTarget, level.targetPos, level.targetPosMove);
                 
                 GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().prepareLevel();
+                levelText.text = string.Format("Level {0} \nGravity: {1:0.##}", currLevel + 1, -levels[currLevel].gravity);
     }
 
     public void startGame(){
@@ -128,7 +130,9 @@ public class GameManagerArrows : MonoBehaviour
 
     public void nextLevel(){
         currLevel +=1;
-        setLevels(currLevel);
+        if (currLevel >= levels.Length){
+            gameOverMode();
+        }
         prepareLevel();
         // update the targets and movement of the cellulos
     }
@@ -144,26 +148,13 @@ public class GameManagerArrows : MonoBehaviour
         isRunning = false;
         canvas.SetActive(false);
 
-        GameObject[] dogs = GameObject.FindGameObjectsWithTag("Dog");
-        GameObject winner = dogs[0];
-
-        foreach(GameObject dog in dogs){
-            if(dog.GetComponent<MoveWithKeyboardBehavior>().getScore() > winner.GetComponent<MoveWithKeyboardBehavior>().getScore()){
-                winner = dog;
-            }
-        }
-
-        text.text = string.Format("{0} won the game", winner.GetComponent<MoveWithKeyboardBehavior>().name);
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        winnerText.text = string.Format("You scored {0}", player.GetComponent<PlayerControl>().getScore().ToString());
         winnerCanvas.SetActive(true);
     }
 
     public void loadMenu(){
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
-    }
-
-    private void setLevels(int levelNumber){
-       PlayerPrefs.SetString("Level1", "level"+levelNumber);
-
     }
 
     // Called by each cellulos when it is at the right place and ready to start
@@ -174,9 +165,7 @@ public class GameManagerArrows : MonoBehaviour
                 alreadyPresent = true;
             }
         }
-        print(alreadyPresent);
         if (!alreadyPresent){
-            print(readyChars.Count());
             readyChars.Add(character);
         }
         if (readyChars.Count == 3){
