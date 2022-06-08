@@ -60,6 +60,7 @@ public class GameManagerArrows : MonoBehaviour
     // Start is called before the first frame update
     public void Start()
     {
+        PlayerPrefs.SetInt("displacement1", 0);
         levels = getLevels();
         audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;

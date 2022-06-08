@@ -263,7 +263,6 @@ public class CelluloAgent : SteeringAgent
         }
         else{ 
             transform.localPosition = new Vector3(x,0,y);
-            SendMessage("OnGoalPoseReached",SendMessageOptions.DontRequireReceiver);
         }
     }
 
