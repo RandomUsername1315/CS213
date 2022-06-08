@@ -239,13 +239,17 @@ public class PlayerControl : AgentBehaviour
                 steering.linear = this.transform.parent.TransformDirection (Vector3.ClampMagnitude(steering.linear , agent.maxAccel));
                 loadingLeds();
 
-                if (Input.GetKeyDown(KeyCode.Return)){
-                    OnCelluloTouchReleased(0);
-                }
+               
                 break;
         }
 
         return steering;
+    }
+
+    void OnGUI() {
+        if (Event.current.Equals(Event.KeyboardEvent(KeyCode.Backspace.ToString())) || Event.current.Equals(Event.KeyboardEvent(KeyCode.Return.ToString()))){
+            OnCelluloTouchReleased(0);
+        }
     }
 
     private void loadingLeds(){

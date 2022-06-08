@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.Animations;
+using UnityEngine.Animations;
 
 public class GameManager : MonoBehaviour
 {
