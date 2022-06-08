@@ -46,6 +46,7 @@ public class GameManagerArrows : MonoBehaviour
     public GameObject canvas;
     public GameObject winnerCanvas;
     public GameObject startCanvas;
+    public TextAsset csvFile;
     public Text winnerText;
     public Text levelText;
     public AudioSource audioSource;
@@ -60,7 +61,6 @@ public class GameManagerArrows : MonoBehaviour
     // Start is called before the first frame update
     public void Start()
     {
-        PlayerPrefs.SetInt("displacement1", 0);
         levels = getLevels();
         audioSource = audioSource.GetComponent<AudioSource>();
         isRunning = false;
@@ -84,7 +84,8 @@ public class GameManagerArrows : MonoBehaviour
     */
     private Level[] getLevels(){
         List<Level> levels = new List<Level>();
-        string[] csvLines = File.ReadAllLines("Assets/Scripts/Game/Levels.csv");
+        string[] csvLines = csvFile.text.Split('\n');
+
         foreach (string line in csvLines)
         {
             // allows commented lines using the % character
@@ -133,9 +134,10 @@ public class GameManagerArrows : MonoBehaviour
         currLevel +=1;
         if (currLevel >= levels.Length){
             gameOverMode();
+        }else {
+            prepareLevel();
         }
-        prepareLevel();
-        // update the targets and movement of the cellulos
+         // update the targets and movement of the cellulos
     }
     public int getLevel(){
         return currLevel;
